@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Главная</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+        integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <style>
+        .tables-container.jumbotron {
+            margin-bottom: 0;
+            background-color: #fdfdfd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tables-container jumbotron">
+        <h1 class="display-4 h1">Tables</h1>
+        <div class="container-fluid lead" id="tables"></div>
+    </div>
+
+    <script>
+        const tablesBody = document.getElementById('tables');
+        const getTableData = () => {
+            return fetch('/tables', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then((response) => {
+                return response.json();
+            });
+        };
+        const generateTable = (data) => {
+            console.log(data);
+            const colsCount = data[0].length;
+            console.log(colsCount);
+            const table = document.createElement('table');
+            table.className = "table table-striped";
+            const thead = document.createElement('thead');
+            const theadTr = document.createElement('tr');
+            const theadThFirst = document.createElement('th');
+            theadTr.append(theadThFirst);
+
+            for (let index = 0; index < colsCount; index++) {
+                const th = document.createElement('th');
+                th.setAttribute('scope', 'col');
+                th.innerText = 'col' + (index + 1);
+                theadTr.append(th);
+            }
+            thead.append(theadTr);
+
+            const tbody = document.createElement('tbody');
+
+            for (let indexRow = 0; indexRow < data.length; indexRow++) {
+                const row = data[indexRow];
+                const tbodyTr = document.createElement('tr');
+
+                const thFirst = document.createElement('th');
+                thFirst.setAttribute('scope', 'col');
+                thFirst.innerText = 'row' + (indexRow + 1);
+                tbodyTr.append(thFirst);
+
+                for (let indexCol = 0; indexCol < row.length; indexCol++) {
+                    const value = row[indexCol];
+                    const td = document.createElement('td');
+                    td.innerText = value;
+                    tbodyTr.append(td);
+                }
+                tbody.append(tbodyTr);
+            }
+
+            table.append(thead);
+            table.append(tbody);
+            return table;
+        };
+
+        window.addEventListener("load", () => {
+            const tableData = getTableData();
+            tableData.then((data) => {
+                for (let index = 0; index < data.length; index++) {
+                    const table = generateTable(data[index]);
+                    tablesBody.append(table);
+                }
+            });
+        });
+    </script>
+</body>
+<html>
